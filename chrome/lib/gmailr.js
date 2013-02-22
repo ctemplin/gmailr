@@ -130,6 +130,7 @@
          *   'numUnreadChange' - currentVal, previousVal
          *   'delete'          - count
          *   'spam'            - count
+         *   'composeStart'
          *   'compose'
          *   'viewChanged'
          *   'applyLabel'
@@ -312,6 +313,7 @@
             spam: [],
             reply: [],
             tabChange: [],
+            composeStart: [],
             compose: [],
             numUnreadChange: [],
             inboxCountChange: [],
@@ -469,6 +471,7 @@
         },
 
         inConversationView: false,
+        inComposeView: false,
 
         detectDOMEvents: function(e) {
             var el = $(e.target);
@@ -488,6 +491,28 @@
                     this.currentNumUnread = this.numUnread();
                 }
             }*/
+
+            // Old-style composer. TODO improve detection
+            // criteria. Currently matching content string.
+            if(e.target.outerText.substring(0,4) == "From") {
+                if(!this.inComposeView) {
+                    this.inComposeView = true;
+                    this.executeObQueues('composeStart');
+                }
+            } else {
+                this.inComposeView = false;
+            }
+            // New-style composer. TODO improve detection
+            // criteria. Currently matching content string.
+            if(e.target.outerText.indexOf("New Message") != -1) {
+                if(!this.inComposeView) {
+                    this.inComposeView = true;
+                    this.executeObQueues('composeStart');
+                }
+            } else {
+                this.inComposeView = false;
+            }
+
 
             if(this.elements.canvas.find('.ha').length > 0) {
                 if(!this.inConversationView) {
